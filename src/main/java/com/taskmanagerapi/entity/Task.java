@@ -1,33 +1,42 @@
 package com.taskmanagerapi.entity;
 
+//""""""" Import classes used to represent dates and times. """"""""""""""""""""""""
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 
+//""""""" Import JPA annotations to map this Java class to a database table. """""""
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+//""""""" Marks this class as a JPA entity so Hibernate can persist tasks in the database.
 @Entity 
 public class Task {
-    //arguments
+//""""""" Unique identifier for each task, generated automatically by the database.
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+//""""""" Title summarising what the task is about.
     private String tittle;
+//""""""" Optional details explaining what needs to be done.
     private String description;
+//""""""" Indicates whether the task has been completed.
     private boolean completed;
+//""""""" Records the date and time when the task was created.
     private LocalDateTime createdAt;
+//""""""" Stores the deadline for completing the task.
     private LocalDate dueDate;
+//""""""" Associates this task with a user & Many tasks can belong to the same user.
     @ManyToOne 
     private User user;
    
-    //default constructor
+//""""""" Default constructor required by JPA when creating entity instances.
     public Task() {
     }
 
-    //getters
+//""""""" getters
     public Long getId() {
         return id;
     }
@@ -56,7 +65,7 @@ public class Task {
         return user;
     }
 
-    //setters
+//""""""setters
     public void setTittle(String tittle) {
         this.tittle = tittle;
     }
