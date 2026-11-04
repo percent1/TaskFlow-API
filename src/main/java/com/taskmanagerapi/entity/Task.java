@@ -2,6 +2,9 @@ package com.taskmanagerapi.entity;
 
 //""""""" Import classes used to represent dates and times. """"""""""""""""""""""""
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDate;
 
 //""""""" Import JPA annotations to map this Java class to a database table. """""""
@@ -10,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+
 
 //""""""" Marks this class as a JPA entity so Hibernate can persist tasks in the database.
 @Entity 
@@ -29,7 +33,8 @@ public class Task {
 //""""""" Stores the deadline for completing the task.
     private LocalDate dueDate;
 //""""""" Associates this task with a user & Many tasks can belong to the same user.
-    @ManyToOne 
+     @JsonIgnore
+    @ManyToOne
     private User user;
    
 //""""""" Default constructor required by JPA when creating entity instances.

@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity 
 public class User {
@@ -18,6 +19,7 @@ public class User {
     private String name;
     @Column(nullable = false,unique = true)
     private String email;
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
     @OneToMany(mappedBy = "user")
