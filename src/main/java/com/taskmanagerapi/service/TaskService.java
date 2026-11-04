@@ -1,4 +1,3 @@
-
 package com.taskmanagerapi.service;
 
 import java.time.LocalDateTime;
@@ -8,9 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.taskmanagerapi.entity.Task;
 import com.taskmanagerapi.entity.User;
+import com.taskmanagerapi.exception.ResourceNotFoundException;
 import com.taskmanagerapi.repository.TaskRepository;
 import com.taskmanagerapi.repository.UserRepository;
-import com.taskmanagerapi.exception.ResourceNotFoundException;
 
 @Service
 public class TaskService {
@@ -18,16 +17,26 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository,
-                       UserRepository userRepository) {
+    public TaskService(
+            TaskRepository taskRepository,
+            UserRepository userRepository) {
+
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
     }
 
-    // Create a task for a specific user.
-    public Task createTask(Long userId, Task task) {
+    // Find the database user using their authenticated email.
+    private User getAuthenticatedUser(String email) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+    }
+
+    // Create a task for the authenticated user.
+    public Task createTask(String email, Task task) {
+
+        User user = getAuthenticatedUser(email);
 
         task.setUser(user);
         task.setCreatedAt(LocalDateTime.now());
@@ -36,22 +45,28 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // Retrieve all tasks belonging to a user.
-    public List<Task> getAllTasks(Long userId) {
-        return taskRepository.findByUser_Id(userId);
+    // Retrieve all tasks belonging to the authenticated user.
+    public List<Task> getAllTasks(String email) {
+
+        User user = getAuthenticatedUser(email);
+
+        return taskRepository.findByUser_Id(user.getId());
     }
 
-    // Retrieve a specific task belonging to a user.
-    public Task getTaskById(Long userId, Long taskId) {
+    // Retrieve a task only if it belongs to the authenticated user.
+    public Task getTaskById(String email, Long taskId) {
 
-        return taskRepository.findByIdAndUser_Id(taskId, userId).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
-                
+        User user = getAuthenticatedUser(email);
+
+        return taskRepository.findByIdAndUser_Id(taskId, user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Task not found"));
     }
 
-    // Update an existing task.
-    public Task updateTask(Long userId, Long taskId, Task updatedTask) {
+    // Update a task only if it belongs to the authenticated user.
+    public Task updateTask(String email, Long taskId, Task updatedTask) {
 
-        Task existingTask = getTaskById(userId, taskId);
+        Task existingTask = getTaskById(email, taskId);
 
         existingTask.setTittle(updatedTask.getTittle());
         existingTask.setDescription(updatedTask.getDescription());
@@ -61,10 +76,10 @@ public class TaskService {
         return taskRepository.save(existingTask);
     }
 
-    // Delete a task belonging to a user.
-    public void deleteTask(Long userId, Long taskId) {
+    // Delete a task only if it belongs to the authenticated user.
+    public void deleteTask(String email, Long taskId) {
 
-        Task task = getTaskById(userId, taskId);
+        Task task = getTaskById(email, taskId);
 
         taskRepository.delete(task);
     }

@@ -3,6 +3,9 @@ package com.taskmanagerapi.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.taskmanagerapi.service.UserService;
+
+import jakarta.validation.Valid;
+
 import com.taskmanagerapi.entity.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user) {
         return userService.createUser(user);
     }
     

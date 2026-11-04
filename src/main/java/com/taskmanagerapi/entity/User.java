@@ -7,7 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity 
 public class User {
@@ -15,13 +18,22 @@ public class User {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
+
+    @NotBlank(message = "Name is required")
     @Column(nullable = false)
     private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please provide a valid email address")
     @Column(nullable = false,unique = true)
     private String email;
-    @JsonIgnore
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     @Column(nullable = false)
     private String password;
+    
     @OneToMany(mappedBy = "user")
     private List<Task> tasks;
 

@@ -1,14 +1,13 @@
-
 package com.taskmanagerapi.repository;
 
-// Import the User entity that this repository will manage.
-import com.taskmanagerapi.entity.User;
+import java.util.Optional;
 
-// Import Spring Data JPA's JpaRepository interface.
 import org.springframework.data.jpa.repository.JpaRepository;
 
-// Provides database operations for User entities.
-// JpaRepository includes methods such as save(), findAll(), findById(), and deleteById().
+import com.taskmanagerapi.entity.User;
+
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    // Find a registered user using their email address
+    Optional<User> findByEmail(String email);
 }
