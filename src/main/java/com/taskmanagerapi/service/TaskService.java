@@ -10,6 +10,7 @@ import com.taskmanagerapi.entity.Task;
 import com.taskmanagerapi.entity.User;
 import com.taskmanagerapi.repository.TaskRepository;
 import com.taskmanagerapi.repository.UserRepository;
+import com.taskmanagerapi.exception.ResourceNotFoundException;
 
 @Service
 public class TaskService {
@@ -26,8 +27,7 @@ public class TaskService {
     // Create a task for a specific user.
     public Task createTask(Long userId, Task task) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         task.setUser(user);
         task.setCreatedAt(LocalDateTime.now());
@@ -44,8 +44,8 @@ public class TaskService {
     // Retrieve a specific task belonging to a user.
     public Task getTaskById(Long userId, Long taskId) {
 
-        return taskRepository.findByIdAndUser_Id(taskId, userId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+        return taskRepository.findByIdAndUser_Id(taskId, userId).orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+                
     }
 
     // Update an existing task.

@@ -13,7 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 //""""""" Marks this class as a JPA entity so Hibernate can persist tasks in the database.
 @Entity 
@@ -23,8 +24,11 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 //""""""" Title summarising what the task is about.
+    @NotBlank(message = "Task title is required")
+    @Size(max = 100, message = "Task title cannot exceed 100 characters")
     private String tittle;
 //""""""" Optional details explaining what needs to be done.
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
 //""""""" Indicates whether the task has been completed.
     private boolean completed;

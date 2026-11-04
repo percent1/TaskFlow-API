@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.taskmanagerapi.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-     @GetMapping("/{id}")
+    @GetMapping("/{id}")
     public User getUserByID(@PathVariable Long id) {
-        return userService.getUserById(id).orElseThrow(()-> new RuntimeException("User not found"));
+        return userService.getUserById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
 }

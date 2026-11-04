@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import com.taskmanagerapi.entity.User;
 import com.taskmanagerapi.repository.UserRepository;
-import com.taskmanagerapi.entity.*;;
 
 @Service 
 public class UserService {
