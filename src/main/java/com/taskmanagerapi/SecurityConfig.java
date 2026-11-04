@@ -30,13 +30,13 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // Configure BCrypt password encryption.
+    // Password encryption using BCrypt.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Configure authentication using users stored in the database.
+    // Authentication provider that loads users from the database.
     @Bean
     public AuthenticationProvider authenticationProvider(
             CustomUserDetailsService userDetailsService,
@@ -50,7 +50,7 @@ public class SecurityConfig {
         return provider;
     }
 
-    // Provide the authentication manager used during login.
+    // Authentication manager used during login.
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration) throws Exception {
@@ -58,14 +58,14 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    // Configure application security and JWT authentication.
+    // Main Spring Security configuration.
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             AuthenticationProvider authenticationProvider) throws Exception {
 
         http
-            // Disable CSRF because this API uses JWT authentication.
+            // Disable CSRF for this stateless REST API.
             .csrf(csrf -> csrf.disable())
 
             // Do not create HTTP sessions.
@@ -73,24 +73,37 @@ public class SecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // Register database authentication provider.
+            // Register the database authentication provider.
             .authenticationProvider(authenticationProvider)
 
-            // Define public and protected endpoints.
+            // Define which endpoints are publicly accessible.
             .authorizeHttpRequests(auth -> auth
+
+                    // Allow Swagger UI and OpenAPI documentation.
+                    .requestMatchers(
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/v3/api-docs/**"
+                    ).permitAll()
+
+                    // Allow user registration.
                     .requestMatchers(HttpMethod.POST, "/users").permitAll()
+
+                    // Allow user login.
                     .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+
+                    // Require authentication for everything else.
                     .anyRequest().authenticated()
             )
 
-            // Return 401 when authentication is missing or invalid.
+            // Return HTTP 401 when authentication is required.
             .exceptionHandling(exception -> exception
                     .authenticationEntryPoint(
                             new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
                     )
             )
 
-            // Run JWT filter before Spring's username/password filter.
+            // Process JWT authentication before username/password authentication.
             .addFilterBefore(
                     jwtAuthenticationFilter,
                     UsernamePasswordAuthenticationFilter.class
