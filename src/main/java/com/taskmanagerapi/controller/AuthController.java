@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taskmanagerapi.dto.LoginRequest;
 import com.taskmanagerapi.dto.LoginResponse;
+import com.taskmanagerapi.entity.User;
+import com.taskmanagerapi.repository.UserRepository;
 import com.taskmanagerapi.service.JwtService;
 
 import jakarta.validation.Valid;
@@ -21,20 +23,23 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     public AuthController(
             AuthenticationManager authenticationManager,
-            JwtService jwtService) {
+            JwtService jwtService,
+            UserRepository userRepository) {
 
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request) {
 
-        // Authenticate the email and password against MySQL
+        // Authenticate the email and password against MySQL.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
@@ -42,11 +47,16 @@ public class AuthController {
                 )
         );
 
-        // Generate a JWT after successful authentication
+        // Generate a JWT after successful authentication.
         String token = jwtService.generateToken(authentication.getName());
 
+        // Retrieve the authenticated user's details.
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Return the token and user's name.
         return ResponseEntity.ok(
-                new LoginResponse(token, "Bearer")
+                new LoginResponse(token, "Bearer", user.getName())
         );
     }
 }
