@@ -39,7 +39,7 @@ public class SecurityConfig {
     // Configure which frontend origins can communicate with this API.
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins:http://localhost:5173}")
+            @Value("${app.cors.allowed-origins:https://taskflow-ten-pi-71.vercel.app}")
             String allowedOrigins) {
 
         CorsConfiguration configuration = new CorsConfiguration();
